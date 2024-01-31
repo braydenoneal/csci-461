@@ -42,6 +42,8 @@ window = GraphWin('A*', window_width, window_height)
 window_scaling = 71
 window_padding = 64
 
+lines = {}
+
 
 def draw_circle(node: Node):
     center_point = Point(node.position[0] * window_scaling + window_padding,
@@ -57,16 +59,23 @@ def draw_circle(node: Node):
 
 
 def draw_line(node: Node, adjacent_node: Node, color='black'):
-    line = Line(Point(node.position[0] * window_scaling + window_padding,
-                      node.position[1] * window_scaling + window_padding),
-                Point(adjacent_node.position[0] * window_scaling + window_padding,
-                      adjacent_node.position[1] * window_scaling + window_padding))
-    line.setWidth(2)
-    line.setFill(color)
-    line.draw(window)
+    if f'{(node, adjacent_node)}' in lines:
+        lines[f'{(node, adjacent_node)}'].setFill(color)
+    elif f'{(adjacent_node, node)}' in lines:
+        lines[f'{(adjacent_node, node)}'].setFill(color)
+    else:
+        line = Line(Point(node.position[0] * window_scaling + window_padding,
+                          node.position[1] * window_scaling + window_padding),
+                    Point(adjacent_node.position[0] * window_scaling + window_padding,
+                          adjacent_node.position[1] * window_scaling + window_padding))
+        line.setWidth(2)
+        line.setFill(color)
+        line.draw(window)
 
-    draw_circle(node)
-    draw_circle(adjacent_node)
+        lines[f'{(node, adjacent_node)}'] = line
+
+        draw_circle(node)
+        draw_circle(adjacent_node)
 
 
 for node in nodes:
