@@ -11,27 +11,27 @@ class Node:
 
 
 nodes = [Node(*node) for node in [
-    [(5.04, 2.39), [8, 9]],
-    [(0.00, 0.61), [2]],
-    [(1.62, 0.59), [1, 3, 6, 12]],
-    [(3.77, 0.01), [2, 4, 6]],
-    [(6.48, 0.00), [3, 5, 7]],
-    [(8.51, 0.03), [4, 11]],
-    [(3.80, 0.62), [2, 3, 7, 8]],
-    [(6.48, 0.72), [4, 6, 10]],
-    [(3.79, 2.42), [0, 6, 13]],
-    [(5.69, 2.46), [0, 10, 14]],
-    [(6.51, 2.45), [7, 9, 11, 15, 16]],
-    [(8.45, 1.76), [5, 10, 16]],
-    [(1.75, 4.61), [2, 13]],
-    [(3.49, 4.61), [8, 12, 14, 17]],
-    [(5.65, 4.62), [9, 13, 15, 18]],
-    [(6.41, 4.61), [10, 14, 16, 19]],
-    [(8.51, 4.70), [10, 11, 15, 20]],
-    [(3.58, 6.11), [13, 18]],
-    [(5.66, 6.15), [14, 17, 19]],
-    [(6.44, 6.11), [15, 18, 20]],
-    [(8.54, 6.27), [16, 19]],
+    ((5.04, 2.39), [8, 9]),
+    ((0.00, 0.61), [2]),
+    ((1.62, 0.59), [1, 3, 6, 12]),
+    ((3.77, 0.01), [2, 4, 6]),
+    ((6.48, 0.00), [3, 5, 7]),
+    ((8.51, 0.03), [4, 11]),
+    ((3.80, 0.62), [2, 3, 7, 8]),
+    ((6.48, 0.72), [4, 6, 10]),
+    ((3.79, 2.42), [0, 6, 13]),
+    ((5.69, 2.46), [0, 10, 14]),
+    ((6.51, 2.45), [7, 9, 11, 15, 16]),
+    ((8.45, 1.76), [5, 10, 16]),
+    ((1.75, 4.61), [2, 13]),
+    ((3.49, 4.61), [8, 12, 14, 17]),
+    ((5.65, 4.62), [9, 13, 15, 18]),
+    ((6.41, 4.61), [10, 14, 16, 19]),
+    ((8.51, 4.70), [10, 11, 15, 20]),
+    ((3.58, 6.11), [13, 18]),
+    ((5.66, 6.15), [14, 17, 19]),
+    ((6.44, 6.11), [15, 18, 20]),
+    ((8.54, 6.27), [16, 19]),
 ]]
 
 window_width = 720
@@ -45,9 +45,15 @@ window_padding = 64
 lines = {}
 
 
+def point_at_node_position(position: tuple[float, float]) -> Point:
+    x_position = position[0] * window_scaling + window_padding
+    y_position = position[1] * window_scaling + window_padding
+
+    return Point(x_position, y_position)
+
+
 def draw_circle(node: Node):
-    center_point = Point(node.position[0] * window_scaling + window_padding,
-                         node.position[1] * window_scaling + window_padding)
+    center_point = point_at_node_position(node.position)
 
     circle = Circle(center_point, 16)
     circle.setFill('white')
@@ -64,10 +70,7 @@ def draw_line(node: Node, adjacent_node: Node, color='black'):
     elif f'{(adjacent_node, node)}' in lines:
         lines[f'{(adjacent_node, node)}'].setFill(color)
     else:
-        line = Line(Point(node.position[0] * window_scaling + window_padding,
-                          node.position[1] * window_scaling + window_padding),
-                    Point(adjacent_node.position[0] * window_scaling + window_padding,
-                          adjacent_node.position[1] * window_scaling + window_padding))
+        line = Line(point_at_node_position(node.position), point_at_node_position(adjacent_node.position))
         line.setWidth(2)
         line.setFill(color)
         line.draw(window)
