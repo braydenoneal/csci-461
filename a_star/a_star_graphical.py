@@ -52,7 +52,7 @@ def draw_circle(node: Node):
     circle.setWidth(2)
     circle.draw(window)
 
-    text = Text(center_point, nodes.index(node))
+    text = Text(center_point, nodes.index(node) + 1)
     text.draw(window)
 
 
