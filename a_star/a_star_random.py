@@ -14,24 +14,26 @@ class Node:
 nodes = []
 
 size = 20
+density = 40
+scale = 0.4
 
 for y in range(size):
     for x in range(size):
         adjacent_node_indices = []
 
-        if x - 1 >= 0 and random.choice([False, True]):
+        if x - 1 >= 0 and random.randint(0, 100) < density:
             adjacent_node_indices.append(y * size + x - 1)
 
-        if x + 1 < size and random.choice([False, True]):
+        if x + 1 < size and random.randint(0, 100) < density:
             adjacent_node_indices.append(y * size + x + 1)
 
-        if y - 1 >= 0 and random.choice([False, True]):
+        if y - 1 >= 0 and random.randint(0, 100) < density:
             adjacent_node_indices.append((y - 1) * size + x)
 
-        if y + 1 < size and random.choice([False, True]):
+        if y + 1 < size and random.randint(0, 100) < density:
             adjacent_node_indices.append((y + 1) * size + x)
 
-        nodes.append(Node((x * 0.4, y * 0.4), adjacent_node_indices))
+        nodes.append(Node((x * scale, y * scale), adjacent_node_indices))
 
 for node_index, node in enumerate(nodes):
     for adjacent_node_index in node.adjacent_node_indices:
@@ -108,6 +110,8 @@ visited = []
 current_node = start_node
 current_total_cost = 0
 
+speed = 0.01
+
 while current_node is not end_node:
     if current_node not in path:
         path.append(current_node)
@@ -118,7 +122,7 @@ while current_node is not end_node:
     for adjacent_node in adjacent_nodes:
         if adjacent_node not in path and adjacent_node not in visited:
             draw_line(current_node, adjacent_node, 'green')
-            time.sleep(0.01)
+            time.sleep(speed)
             draw_line(current_node, adjacent_node)
 
             distance_to_adjacent_node = math.dist(current_node.position, adjacent_node.position)
@@ -138,6 +142,7 @@ while current_node is not end_node:
         current_node = path[-2]
         visited.append(last_node)
         path.pop()
+        time.sleep(speed)
         draw_line(current_node, last_node, 'blue')
 
 window.getMouse()
