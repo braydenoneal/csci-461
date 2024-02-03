@@ -74,11 +74,15 @@ def draw_line(node: Node, adjacent_node: Node, color=color_rgb(64, 64, 64), widt
         lines[f'{(node, adjacent_node)}'] = line
 
 
+window.autoflush = False
+
 for node in nodes:
     adjacent_nodes = [nodes[adjacent_node_index] for adjacent_node_index in node.adjacent_node_indices]
 
     for adjacent_node in adjacent_nodes:
         draw_line(node, adjacent_node)
+
+window.autoflush = True
 
 
 @dataclass
@@ -96,11 +100,7 @@ def sort_paths(paths: list[Path]) -> list[Path]:
 start_node = nodes[0]
 end_node = nodes[-1]
 
-start_path = Path(start_node, 0, math.dist(start_node.position, end_node.position), None)
-
-queue = [start_path]
-
-speed = 0.0005
+queue = [Path(start_node, 0, math.dist(start_node.position, end_node.position), None)]
 
 current_path = queue[-1]
 
@@ -132,7 +132,6 @@ while current_path.node is not end_node:
     best_path = queue[0]
 
     draw_line(best_path.parent.node, best_path.node, color_rgb(255, 255, 255), 3)
-    # time.sleep(speed)
     draw_line(best_path.parent.node, best_path.node, color_rgb(128, 64, 64), 3)
 
     current_path = queue[0]
@@ -145,7 +144,6 @@ while current_path.parent is not None:
 
 for path in complete_path:
     draw_line(path.parent.node, path.node, color_rgb(255, 64, 64), 5)
-    time.sleep(0.005)
 
 window.getMouse()
 window.close()
