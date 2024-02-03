@@ -13,9 +13,9 @@ class Node:
 
 nodes = []
 
-size = 20
-density = 50
-scale = 0.4
+size = 40
+density = 40
+scale = 0.2
 
 for y in range(size):
     for x in range(size):
@@ -42,7 +42,7 @@ for node_index, node in enumerate(nodes):
 window_width = 1000
 window_height = 1000
 
-window = GraphWin('A*', window_width, window_height, autoflush=True)
+window = GraphWin('A*', window_width, window_height)
 window.setBackground(color_rgb(16, 16, 16))
 
 window_scaling = 110
@@ -100,7 +100,7 @@ start_path = Path(start_node, 0, math.dist(start_node.position, end_node.positio
 
 queue = [start_path]
 
-speed = 0.005
+speed = 0.0005
 
 current_path = queue[-1]
 
@@ -110,9 +110,9 @@ while current_path.node is not end_node:
     adjacent_nodes = [nodes[adjacent_node_index] for adjacent_node_index in current_path.node.adjacent_node_indices]
 
     for adjacent_node in adjacent_nodes:
-        # time.sleep(speed)
-
         cost = math.dist(current_path.node.position, adjacent_node.position) + current_path.cost
+        # distance_to_end_node = abs(adjacent_node.position[0] - end_node.position[0]) +
+        #                        abs(adjacent_node.position[1] - end_node.position[1])
         distance_to_end_node = math.dist(adjacent_node.position, end_node.position)
 
         add = True
@@ -131,13 +131,21 @@ while current_path.node is not end_node:
 
     best_path = queue[0]
 
+    draw_line(best_path.parent.node, best_path.node, color_rgb(255, 255, 255), 3)
+    # time.sleep(speed)
     draw_line(best_path.parent.node, best_path.node, color_rgb(128, 64, 64), 3)
 
     current_path = queue[0]
 
+complete_path = []
+
 while current_path.parent is not None:
-    draw_line(current_path.parent.node, current_path.node, color_rgb(255, 64, 64), 5)
+    complete_path.insert(0, current_path)
     current_path = current_path.parent
+
+for path in complete_path:
+    draw_line(path.parent.node, path.node, color_rgb(255, 64, 64), 5)
+    time.sleep(0.005)
 
 window.getMouse()
 window.close()

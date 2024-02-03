@@ -150,7 +150,8 @@ try:  # import as appropriate for 2.x vs. 3.x
 except:
    import Tkinter as tk
 
-
+# ADDED BY ME: Dark mode library
+import sv_ttk
 ##########################################################################
 # Module Exceptions
 
@@ -197,6 +198,10 @@ class GraphWin(tk.Canvas):
         self.closed = False
         master.lift()
         if autoflush: _root.update()
+        # ADDED BY ME: Disable title bar
+        master.overrideredirect(True)
+        # ADDED BY ME: Dark mode
+        sv_ttk.set_theme("dark")
         # ADDED BY ME: Center the window on the screen
         master.geometry(f"+{_root.winfo_x() + _root.winfo_screenwidth()//2 - master.winfo_width()//2}"
                         f"+{_root.winfo_y() + _root.winfo_screenheight()//2 - master.winfo_height()//2}")
