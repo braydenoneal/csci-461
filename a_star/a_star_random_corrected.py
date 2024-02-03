@@ -14,7 +14,7 @@ class Node:
 nodes = []
 
 size = 20
-density = 40
+density = 50
 scale = 0.4
 
 for y in range(size):
@@ -39,12 +39,13 @@ for node_index, node in enumerate(nodes):
     for adjacent_node_index in node.adjacent_node_indices:
         nodes[adjacent_node_index].adjacent_node_indices.append(node_index)
 
-window_width = 720
-window_height = 640
+window_width = 1000
+window_height = 1000
 
-window = GraphWin('A*', window_width, window_height)
+window = GraphWin('A*', window_width, window_height, autoflush=True)
+window.setBackground(color_rgb(16, 16, 16))
 
-window_scaling = 71
+window_scaling = 110
 window_padding = 64
 
 lines = {}
@@ -57,26 +58,16 @@ def point_at_node_position(position: tuple[float, float]) -> Point:
     return Point(x_position, y_position)
 
 
-def draw_circle(node: Node):
-    center_point = point_at_node_position(node.position)
-
-    circle = Circle(center_point, 16)
-    circle.setFill('white')
-    circle.setWidth(2)
-    circle.draw(window)
-
-    text = Text(center_point, nodes.index(node) + 1)
-    text.draw(window)
-
-
-def draw_line(node: Node, adjacent_node: Node, color='black'):
+def draw_line(node: Node, adjacent_node: Node, color=color_rgb(64, 64, 64), width=2):
     if f'{(node, adjacent_node)}' in lines:
+        lines[f'{(node, adjacent_node)}'].setWidth(width)
         lines[f'{(node, adjacent_node)}'].setFill(color)
     elif f'{(adjacent_node, node)}' in lines:
+        lines[f'{(adjacent_node, node)}'].setWidth(width)
         lines[f'{(adjacent_node, node)}'].setFill(color)
     else:
         line = Line(point_at_node_position(node.position), point_at_node_position(adjacent_node.position))
-        line.setWidth(2)
+        line.setWidth(width)
         line.setFill(color)
         line.draw(window)
 
@@ -109,15 +100,12 @@ start_path = Path(start_node, 0, math.dist(start_node.position, end_node.positio
 
 queue = [start_path]
 
-visited = []
-
 speed = 0.005
 
 current_path = queue[-1]
 
 while current_path.node is not end_node:
     queue.pop(0)
-    visited.append(current_path)
 
     adjacent_nodes = [nodes[adjacent_node_index] for adjacent_node_index in current_path.node.adjacent_node_indices]
 
@@ -143,12 +131,12 @@ while current_path.node is not end_node:
 
     best_path = queue[0]
 
-    draw_line(best_path.parent.node, best_path.node, 'red')
+    draw_line(best_path.parent.node, best_path.node, color_rgb(128, 64, 64), 3)
 
     current_path = queue[0]
 
 while current_path.parent is not None:
-    draw_line(current_path.parent.node, current_path.node, 'green')
+    draw_line(current_path.parent.node, current_path.node, color_rgb(255, 64, 64), 5)
     current_path = current_path.parent
 
 window.getMouse()
