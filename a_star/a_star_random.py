@@ -13,9 +13,9 @@ class Node:
 
 nodes = []
 
-size = 20
+size = 40
 density = 40
-scale = 0.4
+scale = 0.2
 
 for y in range(size):
     for x in range(size):
@@ -39,12 +39,13 @@ for node_index, node in enumerate(nodes):
     for adjacent_node_index in node.adjacent_node_indices:
         nodes[adjacent_node_index].adjacent_node_indices.append(node_index)
 
-window_width = 720
-window_height = 640
+window_width = 1000
+window_height = 1000
 
 window = GraphWin('A*', window_width, window_height)
+window.setBackground(color_rgb(16, 16, 16))
 
-window_scaling = 71
+window_scaling = 110
 window_padding = 64
 
 lines = {}
@@ -69,25 +70,31 @@ def draw_circle(node: Node):
     text.draw(window)
 
 
-def draw_line(node: Node, adjacent_node: Node, color='black'):
+def draw_line(node: Node, adjacent_node: Node, color=color_rgb(64, 64, 64), width=2):
     if f'{(node, adjacent_node)}' in lines:
+        lines[f'{(node, adjacent_node)}'].setWidth(width)
         lines[f'{(node, adjacent_node)}'].setFill(color)
     elif f'{(adjacent_node, node)}' in lines:
+        lines[f'{(adjacent_node, node)}'].setWidth(width)
         lines[f'{(adjacent_node, node)}'].setFill(color)
     else:
         line = Line(point_at_node_position(node.position), point_at_node_position(adjacent_node.position))
-        line.setWidth(2)
+        line.setWidth(width)
         line.setFill(color)
         line.draw(window)
 
         lines[f'{(node, adjacent_node)}'] = line
 
 
+window.autoflush = False
+
 for node in nodes:
     adjacent_nodes = [nodes[adjacent_node_index] for adjacent_node_index in node.adjacent_node_indices]
 
     for adjacent_node in adjacent_nodes:
         draw_line(node, adjacent_node)
+
+window.autoflush = True
 
 
 @dataclass
@@ -110,7 +117,7 @@ visited = []
 current_node = start_node
 current_total_cost = 0
 
-speed = 0.01
+speed = 0.0005
 
 while current_node is not end_node:
     if current_node not in path:
@@ -121,7 +128,7 @@ while current_node is not end_node:
 
     for adjacent_node in adjacent_nodes:
         if adjacent_node not in path and adjacent_node not in visited:
-            draw_line(current_node, adjacent_node, 'green')
+            draw_line(current_node, adjacent_node, color_rgb(128, 64, 64), 3)
             time.sleep(speed)
             draw_line(current_node, adjacent_node)
 
@@ -134,7 +141,7 @@ while current_node is not end_node:
         best_path = get_best_path(paths, current_total_cost)
         current_total_cost += best_path.distance_to_adjacent_node
 
-        draw_line(current_node, best_path.node, 'red')
+        draw_line(current_node, best_path.node, color_rgb(255, 64, 64), 5)
 
         current_node = best_path.node
     else:
@@ -143,7 +150,7 @@ while current_node is not end_node:
         visited.append(last_node)
         path.pop()
         time.sleep(speed)
-        draw_line(current_node, last_node, 'blue')
+        draw_line(current_node, last_node, color_rgb(96, 64, 64))
 
 window.getMouse()
 window.close()

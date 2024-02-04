@@ -184,7 +184,7 @@ class GraphWin(tk.Canvas):
         tk.Canvas.__init__(self, master, width=width, height=height)
         self.master.title(title)
         self.pack()
-        master.resizable(0,0)
+        # master.resizable(0,0)
         self.foreground = "black"
         self.items = []
         self.mouseX = None
@@ -199,7 +199,9 @@ class GraphWin(tk.Canvas):
         master.lift()
         if autoflush: _root.update()
         # ADDED BY ME: Disable title bar
-        master.overrideredirect(True)
+        # master.overrideredirect(True)
+        # master.wm_attributes('-toolwindow')
+        # master.wm_attributes('-fullscreen', 'true')
         # ADDED BY ME: Dark mode
         sv_ttk.set_theme("dark")
         # ADDED BY ME: Center the window on the screen
