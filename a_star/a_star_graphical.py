@@ -1,3 +1,4 @@
+from __future__ import annotations
 import math
 from dataclasses import dataclass
 
@@ -8,9 +9,13 @@ from graphics import *
 class Node:
     position: tuple[float, float]
     adjacent_node_indices: list[int]
+    opened: bool
+    cost: float
+    heuristic: float
+    parent: Node or None
 
 
-nodes = [Node(*node) for node in [
+nodes = [Node(node[0], node[1], True, math.inf, 0, None) for node in [
     ((5.04, 2.39), [8, 9]),
     ((0.00, 0.61), [2]),
     ((1.62, 0.59), [1, 3, 6, 12]),
@@ -46,10 +51,7 @@ lines = {}
 
 
 def point_at_node_position(position: tuple[float, float]) -> Point:
-    x_position = position[0] * window_scaling + window_padding
-    y_position = position[1] * window_scaling + window_padding
-
-    return Point(x_position, y_position)
+    return Point(position[0] * window_scaling + window_padding, position[1] * window_scaling + window_padding)
 
 
 def draw_circle(node: Node):
@@ -57,25 +59,30 @@ def draw_circle(node: Node):
 
     circle = Circle(center_point, 16)
     circle.setFill('white')
-    circle.setWidth(2)
+    circle.setWidth(3)
     circle.draw(window)
 
     text = Text(center_point, nodes.index(node) + 1)
     text.draw(window)
 
 
-def draw_line(node: Node, adjacent_node: Node, color='black'):
-    if f'{(node, adjacent_node)}' in lines:
-        lines[f'{(node, adjacent_node)}'].setFill(color)
-    elif f'{(adjacent_node, node)}' in lines:
-        lines[f'{(adjacent_node, node)}'].setFill(color)
+def draw_line(node: Node, adjacent_node: Node, color='black', width=2):
+    first_str = f'{nodes.index(node)} {nodes.index(adjacent_node)}'
+    second_str = f'{nodes.index(adjacent_node)} {nodes.index(node)}'
+
+    if first_str in lines:
+        lines[first_str].setWidth(width)
+        lines[first_str].setFill(color)
+    elif second_str in lines:
+        lines[second_str].setWidth(width)
+        lines[second_str].setFill(color)
     else:
         line = Line(point_at_node_position(node.position), point_at_node_position(adjacent_node.position))
-        line.setWidth(2)
+        line.setWidth(width)
         line.setFill(color)
         line.draw(window)
 
-        lines[f'{(node, adjacent_node)}'] = line
+        lines[first_str] = line
 
         draw_circle(node)
         draw_circle(adjacent_node)
@@ -87,53 +94,42 @@ for node in nodes:
     for adjacent_node in adjacent_nodes:
         draw_line(node, adjacent_node)
 
-
-@dataclass
-class Path:
-    node: Node
-    distance_to_adjacent_node: float
-    distance_to_end_node: float
-
-
-def get_best_path(paths, current_total_cost) -> Path:
-    return sorted(paths, key=lambda x: x.distance_to_adjacent_node + x.distance_to_end_node + current_total_cost)[0]
-
-
-start_node = nodes[0]
+current_node = nodes[0]
 end_node = nodes[1]
 
-path: list[Node] = []
+current_node.cost = 0
 
-current_node = start_node
-current_total_cost = 0
+for node in nodes:
+    node.heuristic = math.dist(node.position, end_node.position)
 
-window.getMouse()
 
 while current_node is not end_node:
-    path.append(current_node)
-
     adjacent_nodes = [nodes[adjacent_node_index] for adjacent_node_index in current_node.adjacent_node_indices]
-    paths = []
 
     for adjacent_node in adjacent_nodes:
-        if adjacent_node not in path:
-            draw_line(current_node, adjacent_node, 'green')
-            time.sleep(0.25)
-            draw_line(current_node, adjacent_node)
+        time.sleep(0.25)
 
-            distance_to_adjacent_node = math.dist(current_node.position, adjacent_node.position)
-            distance_to_end_node = math.dist(adjacent_node.position, end_node.position)
+        cost = current_node.cost + math.dist(current_node.position, adjacent_node.position)
 
-            paths.append(Path(adjacent_node, distance_to_adjacent_node, distance_to_end_node))
+        if cost < adjacent_node.cost:
+            draw_line(current_node, adjacent_node, 'green', 3)
+            adjacent_node.cost = cost
+            adjacent_node.parent = current_node
+            adjacent_node.opened = True
 
-    best_path = get_best_path(paths, current_total_cost)
-    current_total_cost += best_path.distance_to_adjacent_node
+    current_node.opened = False
 
-    draw_line(current_node, best_path.node, 'red')
+    current_node = sorted([x for x in nodes if x.opened], key=lambda x: x.cost + x.heuristic)[0]
 
-    current_node = best_path.node
+    if current_node.parent is not None:
+        draw_line(current_node.parent, current_node, 'blue', 4)
+
+print(round(current_node.cost, 2))
+
+while current_node.parent is not None:
+    time.sleep(0.25)
+    draw_line(current_node.parent, current_node, 'red', 5)
+    current_node = current_node.parent
 
 window.getMouse()
 window.close()
-
-print(current_total_cost)

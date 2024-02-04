@@ -203,7 +203,7 @@ class GraphWin(tk.Canvas):
         # master.wm_attributes('-toolwindow')
         # master.wm_attributes('-fullscreen', 'true')
         # ADDED BY ME: Dark mode
-        sv_ttk.set_theme("dark")
+        # sv_ttk.set_theme("dark")
         # ADDED BY ME: Center the window on the screen
         master.geometry(f"+{_root.winfo_x() + _root.winfo_screenwidth()//2 - master.winfo_width()//2}"
                         f"+{_root.winfo_y() + _root.winfo_screenheight()//2 - master.winfo_height()//2}")
