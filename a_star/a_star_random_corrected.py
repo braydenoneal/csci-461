@@ -1,3 +1,4 @@
+from __future__ import annotations
 import math
 import random
 from dataclasses import dataclass
@@ -59,14 +60,14 @@ class Path:
     node: Node
     cost: float
     distance_to_end_node: float
-    parent: object
+    parent: Path or None
 
 
 def sort_paths(paths: list[Path]) -> list[Path]:
     return sorted(paths, key=lambda x: x.cost + x.distance_to_end_node)
 
 
-def main():
+while True:
     window.autoflush = False
 
     for line in lines:
@@ -81,24 +82,24 @@ def main():
 
     nodes = []
 
-    size = 40
-    density = 40
-    scale = 0.2
+    size = 64
+    density = 0.36
+    scale = 0.125
 
     for y in range(size):
         for x in range(size):
             adjacent_node_indices = []
 
-            if x - 1 >= 0 and random.randint(0, 100) < density:
+            if x - 1 >= 0 and random.random() < density:
                 adjacent_node_indices.append(y * size + x - 1)
 
-            if x + 1 < size and random.randint(0, 100) < density:
+            if x + 1 < size and random.random() < density:
                 adjacent_node_indices.append(y * size + x + 1)
 
-            if y - 1 >= 0 and random.randint(0, 100) < density:
+            if y - 1 >= 0 and random.random() < density:
                 adjacent_node_indices.append((y - 1) * size + x)
 
-            if y + 1 < size and random.randint(0, 100) < density:
+            if y + 1 < size and random.random() < density:
                 adjacent_node_indices.append((y + 1) * size + x)
 
             nodes.append(Node((x * scale, y * scale), adjacent_node_indices))
@@ -165,11 +166,12 @@ def main():
         queue = sort_paths(queue)
 
         if not queue:
-            main()
+            current_path.parent = None
+            break
 
         best_path = queue[0]
 
-        # time.sleep(0.005)
+        # time.sleep(0.01)
         draw_line(best_path.parent.node, best_path.node, color_rgb(128, 64, 64), 3)
 
         current_path = queue[0]
@@ -184,7 +186,3 @@ def main():
         draw_line(path.parent.node, path.node, color_rgb(255, 96, 96), 5)
 
     # window.getMouse()
-    main()
-
-
-main()
