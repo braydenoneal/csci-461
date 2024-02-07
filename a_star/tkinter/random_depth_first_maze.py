@@ -20,13 +20,8 @@ tile_height = (window_height - window_padding * 2) / maze_rows
 
 def dark_title_bar(window):
     window.update()
-    set_window_attribute = ct.windll.dwmapi.DwmSetWindowAttribute
-    get_parent = ct.windll.user32.GetParent
-    hwnd = get_parent(window.winfo_id())
-    rendering_policy = 20
-    value = 2
-    value = ct.c_int(value)
-    set_window_attribute(hwnd, rendering_policy, ct.byref(value), ct.sizeof(value))
+    ct.windll.dwmapi.DwmSetWindowAttribute(
+        ct.windll.user32.GetParent(window.winfo_id()), 20, ct.byref(ct.c_int(2)), ct.sizeof(ct.c_int(2)))
 
 
 root = tk.Tk()
