@@ -39,8 +39,6 @@ for maze_row in range(maze_rows):
         x = maze_column * tile_width + window_padding
         y = maze_row * tile_height + window_padding
 
-        # color = '#666' if tiles[maze_column][maze_row] else '#222'
-
         tile = canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill='#222', outline='')
 
 canvas.pack()
@@ -48,7 +46,7 @@ root.eval('tk::PlaceWindow . center')
 
 tiles = np.zeros((maze_columns, maze_rows), dtype=np.bool_)
 
-start_tile = (0, 0)
+start_tile = (1, 1)
 
 stack = [start_tile]
 
@@ -67,13 +65,13 @@ while len(stack):
 
     options = []
 
-    if current_tile[0] > 0 and (current_tile[0] - 2, current_tile[1]) not in visited:
+    if current_tile[0] > 1 and (current_tile[0] - 2, current_tile[1]) not in visited:
         options.append('left')
-    if current_tile[1] > 0 and (current_tile[0], current_tile[1] - 2) not in visited:
+    if current_tile[1] > 1 and (current_tile[0], current_tile[1] - 2) not in visited:
         options.append('up')
-    if current_tile[0] < maze_columns - 1 and (current_tile[0] + 2, current_tile[1]) not in visited:
+    if current_tile[0] < maze_columns - 2 and (current_tile[0] + 2, current_tile[1]) not in visited:
         options.append('right')
-    if current_tile[1] < maze_rows - 1 and (current_tile[0], current_tile[1] + 2) not in visited:
+    if current_tile[1] < maze_rows - 2 and (current_tile[0], current_tile[1] + 2) not in visited:
         options.append('down')
 
     option = ''
@@ -82,43 +80,32 @@ while len(stack):
         stack.append(current_tile)
         option = random.choice(options)
 
+    intermediate_tile = (0, 0)
+
     if option == 'left':
         tiles[current_tile[0] - 1][current_tile[1]] = True
-
-        x = (current_tile[0] - 1) * tile_width + window_padding
-        y = current_tile[1] * tile_height + window_padding
-
-        canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill='#666', outline='')
-
+        intermediate_tile = (current_tile[0] - 1, current_tile[1])
         stack.append((current_tile[0] - 2, current_tile[1]))
     if option == 'up':
         tiles[current_tile[0]][current_tile[1] - 1] = True
-
-        x = current_tile[0] * tile_width + window_padding
-        y = (current_tile[1] - 1) * tile_height + window_padding
-
-        canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill='#666', outline='')
-
+        intermediate_tile = (current_tile[0], current_tile[1] - 1)
         stack.append((current_tile[0], current_tile[1] - 2))
     if option == 'right':
         tiles[current_tile[0] + 1][current_tile[1]] = True
-
-        x = (current_tile[0] + 1) * tile_width + window_padding
-        y = current_tile[1] * tile_height + window_padding
-
-        canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill='#666', outline='')
-
+        intermediate_tile = (current_tile[0] + 1, current_tile[1])
         stack.append((current_tile[0] + 2, current_tile[1]))
     if option == 'down':
         tiles[current_tile[0]][current_tile[1] + 1] = True
+        intermediate_tile = (current_tile[0], current_tile[1] + 1)
+        stack.append((current_tile[0], current_tile[1] + 2))
 
-        x = current_tile[0] * tile_width + window_padding
-        y = (current_tile[1] + 1) * tile_height + window_padding
+    if option:
+        x = intermediate_tile[0] * tile_width + window_padding
+        y = intermediate_tile[1] * tile_height + window_padding
 
         canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill='#666', outline='')
 
-        stack.append((current_tile[0], current_tile[1] + 2))
-
-    root.update()
+        time.sleep(0.0125)
+        root.update()
 
 root.mainloop()
