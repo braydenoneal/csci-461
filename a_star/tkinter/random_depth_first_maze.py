@@ -11,8 +11,8 @@ window_width = 1000
 window_height = 1000
 window_padding = 64
 
-maze_columns = 63
-maze_rows = 63
+maze_columns = 65
+maze_rows = 65
 
 tile_width = (window_width - window_padding * 2) / maze_columns
 tile_height = (window_height - window_padding * 2) / maze_rows
@@ -32,6 +32,7 @@ def dark_title_bar(window):
 root = tk.Tk()
 root.geometry(f'{window_width}x{window_height}')
 dark_title_bar(root)
+root.configure(background='#101010')
 
 canvas = tk.Canvas(root, width=window_width, height=window_height, background='#101010',
                    bd=0, highlightthickness=0, relief='ridge')
