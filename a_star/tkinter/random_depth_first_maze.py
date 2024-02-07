@@ -41,13 +41,33 @@ root.eval('tk::PlaceWindow . center')
 
 time_step = 0.0005
 
+
+def draw_to_parent(current_node, color):
+    x = current_node.parent.position[0] * tile_width + window_padding
+    y = current_node.parent.position[1] * tile_height + window_padding
+
+    canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill=color, outline='')
+
+    x = (current_node.position[0] + (current_node.parent.position[0] -
+                                     current_node.position[0]) // 2) * tile_width + window_padding
+    y = (current_node.position[1] + (current_node.parent.position[1] -
+                                     current_node.position[1]) // 2) * tile_height + window_padding
+
+    canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill=color, outline='')
+
+    x = current_node.position[0] * tile_width + window_padding
+    y = current_node.position[1] * tile_height + window_padding
+
+    canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill=color, outline='')
+
+
 while True:
     for maze_row in range(maze_rows):
         for maze_column in range(maze_columns):
             x = maze_column * tile_width + window_padding
             y = maze_row * tile_height + window_padding
 
-            tile = canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill='#101010', outline='')
+            tile = canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill='#181818', outline='')
 
     tiles = np.zeros((maze_columns, maze_rows), dtype=np.bool_)
 
@@ -164,24 +184,7 @@ while True:
             current_node = sorted_nodes[0]
 
         if current_node.parent is not None:
-            color = '#804040'
-
-            x = current_node.parent.position[0] * tile_width + window_padding
-            y = current_node.parent.position[1] * tile_height + window_padding
-
-            canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill=color, outline='')
-
-            x = (current_node.position[0] + (current_node.parent.position[0] -
-                                             current_node.position[0]) // 2) * tile_width + window_padding
-            y = (current_node.position[1] + (current_node.parent.position[1] -
-                                             current_node.position[1]) // 2) * tile_height + window_padding
-
-            canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill=color, outline='')
-
-            x = current_node.position[0] * tile_width + window_padding
-            y = current_node.position[1] * tile_height + window_padding
-
-            canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill=color, outline='')
+            draw_to_parent(current_node, '#804040')
 
             time.sleep(time_step)
             root.update()
@@ -189,24 +192,7 @@ while True:
     while current_node.parent is not None:
         time.sleep(time_step)
 
-        color = '#ff6060'
-
-        x = current_node.parent.position[0] * tile_width + window_padding
-        y = current_node.parent.position[1] * tile_height + window_padding
-
-        canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill=color, outline='')
-
-        x = (current_node.position[0] + (current_node.parent.position[0] -
-                                         current_node.position[0]) // 2) * tile_width + window_padding
-        y = (current_node.position[1] + (current_node.parent.position[1] -
-                                         current_node.position[1]) // 2) * tile_height + window_padding
-
-        canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill=color, outline='')
-
-        x = current_node.position[0] * tile_width + window_padding
-        y = current_node.position[1] * tile_height + window_padding
-
-        canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill=color, outline='')
+        draw_to_parent(current_node, '#ff6060')
 
         time.sleep(time_step)
         root.update()
