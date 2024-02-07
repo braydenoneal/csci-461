@@ -136,9 +136,9 @@ while True:
             intermediate_y = current_node.position[1] + direction[1]
 
             if (((direction == (-1, 0) and current_node.position[0] > 1) or
-                    (direction == (0, -1) and current_node.position[1] > 1) or
-                    (direction == (1, 0) and current_node.position[0] < maze_columns - 2) or
-                    (direction == (0, 1) and current_node.position[1] < maze_rows - 2))
+                 (direction == (0, -1) and current_node.position[1] > 1) or
+                 (direction == (1, 0) and current_node.position[0] < maze_columns - 2) or
+                 (direction == (0, 1) and current_node.position[1] < maze_rows - 2))
                     and tiles[intermediate_x][intermediate_y]):
                 adjacent_position = (relative_x, relative_y)
 
