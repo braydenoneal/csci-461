@@ -66,42 +66,23 @@ while len(stack):
     options = []
 
     if current_tile[0] > 1 and (current_tile[0] - 2, current_tile[1]) not in visited:
-        options.append('left')
+        options.append((-1, 0))
     if current_tile[1] > 1 and (current_tile[0], current_tile[1] - 2) not in visited:
-        options.append('up')
+        options.append((0, -1))
     if current_tile[0] < maze_columns - 2 and (current_tile[0] + 2, current_tile[1]) not in visited:
-        options.append('right')
+        options.append((1, 0))
     if current_tile[1] < maze_rows - 2 and (current_tile[0], current_tile[1] + 2) not in visited:
-        options.append('down')
-
-    option = ''
+        options.append((0, 1))
 
     if options:
         stack.append(current_tile)
         option = random.choice(options)
 
-    intermediate_tile = (0, 0)
+        tiles[current_tile[0] + option[0]][current_tile[1] + option[1]] = True
+        stack.append((current_tile[0] + 2 * option[0], current_tile[1] + 2 * option[1]))
 
-    if option == 'left':
-        tiles[current_tile[0] - 1][current_tile[1]] = True
-        intermediate_tile = (current_tile[0] - 1, current_tile[1])
-        stack.append((current_tile[0] - 2, current_tile[1]))
-    if option == 'up':
-        tiles[current_tile[0]][current_tile[1] - 1] = True
-        intermediate_tile = (current_tile[0], current_tile[1] - 1)
-        stack.append((current_tile[0], current_tile[1] - 2))
-    if option == 'right':
-        tiles[current_tile[0] + 1][current_tile[1]] = True
-        intermediate_tile = (current_tile[0] + 1, current_tile[1])
-        stack.append((current_tile[0] + 2, current_tile[1]))
-    if option == 'down':
-        tiles[current_tile[0]][current_tile[1] + 1] = True
-        intermediate_tile = (current_tile[0], current_tile[1] + 1)
-        stack.append((current_tile[0], current_tile[1] + 2))
-
-    if option:
-        x = intermediate_tile[0] * tile_width + window_padding
-        y = intermediate_tile[1] * tile_height + window_padding
+        x = (current_tile[0] + option[0]) * tile_width + window_padding
+        y = (current_tile[1] + option[1]) * tile_height + window_padding
 
         canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill='#666', outline='')
 
