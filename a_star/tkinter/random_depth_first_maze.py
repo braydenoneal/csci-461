@@ -127,6 +127,7 @@ while current_node.position != end_node.position:
 
             cost = current_node.cost + 2
 
+            # heuristic = abs(maze_columns - 1 - adjacent_position[0]) + abs(maze_rows - 1 - adjacent_position[1])
             heuristic = math.dist(adjacent_position, (maze_columns - 1, maze_rows - 1))
 
             duplicates = [x for x in nodes if x.position == adjacent_position]
@@ -151,7 +152,7 @@ while current_node.position != end_node.position:
 
                 canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill=color, outline='')
 
-                # time.sleep(0.005)
+                time.sleep(0.005)
                 root.update()
 
     current_node.opened = False
