@@ -1,8 +1,12 @@
+from __future__ import annotations
+
+import math
 import time
 import tkinter as tk
 import random
 import numpy as np
 import ctypes as ct
+from dataclasses import dataclass
 
 
 window_width = 1000
@@ -86,7 +90,96 @@ while len(stack):
 
         canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill='#666', outline='')
 
-        time.sleep(0.0125)
+        # time.sleep(0.0125)
+        # root.update()
+
+root.update()
+
+
+@dataclass
+class Node:
+    position: tuple[int, int]
+    cost: float
+    heuristic: float
+    opened: bool
+    parent: Node or None
+
+
+current_node = Node((1, 1), 0, math.dist((1, 1), (maze_columns - 2, maze_rows - 2)), True, None)
+end_node = Node((maze_columns - 2, maze_rows - 2), math.inf, 0, True, None)
+
+nodes: list[Node] = [current_node]
+
+while current_node.position != end_node.position:
+    for direction in ((-1, 0), (0, -1), (1, 0), (0, 1)):
+        relative_x = current_node.position[0] + 2 * direction[0]
+        relative_y = current_node.position[1] + 2 * direction[1]
+
+        intermediate_x = current_node.position[0] + direction[0]
+        intermediate_y = current_node.position[1] + direction[1]
+
+        if (((direction == (-1, 0) and current_node.position[0] > 1) or
+                (direction == (0, -1) and current_node.position[1] > 1) or
+                (direction == (1, 0) and current_node.position[0] < maze_columns - 2) or
+                (direction == (0, 1) and current_node.position[1] < maze_rows - 2))
+                and tiles[intermediate_x][intermediate_y]):
+            adjacent_position = (relative_x, relative_y)
+
+            cost = current_node.cost + 2
+
+            heuristic = math.dist(adjacent_position, (maze_columns - 1, maze_rows - 1))
+
+            duplicates = [x for x in nodes if x.position == adjacent_position]
+
+            if duplicates:
+                if cost < duplicates[0].cost:
+                    duplicates[0].cost = cost
+                    duplicates[0].parent = current_node
+                    duplicates[0].opened = True
+            else:
+                nodes.append(Node(adjacent_position, cost, heuristic, True, current_node))
+
+                color = '#f66'
+
+                x = relative_x * tile_width + window_padding
+                y = relative_y * tile_height + window_padding
+
+                canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill=color, outline='')
+
+                x = intermediate_x * tile_width + window_padding
+                y = intermediate_y * tile_height + window_padding
+
+                canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill=color, outline='')
+
+                # time.sleep(0.005)
+                root.update()
+
+    current_node.opened = False
+
+    sorted_nodes = sorted([x for x in nodes if x.opened], key=lambda x: x.cost + x.heuristic)
+
+    if sorted_nodes:
+        current_node = sorted_nodes[0]
+
+    if current_node.parent is not None:
+        color = '#844'
+
+        x = current_node.parent.position[0] * tile_width + window_padding
+        y = current_node.parent.position[1] * tile_height + window_padding
+
+        canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill=color, outline='')
+
+        x = (current_node.position[0] + (current_node.parent.position[0] - current_node.position[0]) // 2) * tile_width + window_padding
+        y = (current_node.position[1] + (current_node.parent.position[1] - current_node.position[1]) // 2) * tile_height + window_padding
+
+        canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill=color, outline='')
+
+        x = current_node.position[0] * tile_width + window_padding
+        y = current_node.position[1] * tile_height + window_padding
+
+        canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill=color, outline='')
+
+        time.sleep(0.005)
         root.update()
 
 root.mainloop()
