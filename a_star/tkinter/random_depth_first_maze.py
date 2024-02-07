@@ -91,7 +91,7 @@ while len(stack):
         canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill='#666', outline='')
 
         # time.sleep(0.0125)
-        # root.update()
+        root.update()
 
 root.update()
 
@@ -170,8 +170,10 @@ while current_node.position != end_node.position:
 
         canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill=color, outline='')
 
-        x = (current_node.position[0] + (current_node.parent.position[0] - current_node.position[0]) // 2) * tile_width + window_padding
-        y = (current_node.position[1] + (current_node.parent.position[1] - current_node.position[1]) // 2) * tile_height + window_padding
+        x = (current_node.position[0] + (current_node.parent.position[0] -
+                                         current_node.position[0]) // 2) * tile_width + window_padding
+        y = (current_node.position[1] + (current_node.parent.position[1] -
+                                         current_node.position[1]) // 2) * tile_height + window_padding
 
         canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill=color, outline='')
 
