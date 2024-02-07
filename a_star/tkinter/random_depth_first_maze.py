@@ -37,7 +37,7 @@ root.configure(background='#101010')
 canvas = tk.Canvas(root, width=window_width, height=window_height, background='#101010',
                    bd=0, highlightthickness=0, relief='ridge')
 
-canvas.pack()
+canvas.pack(expand=True)
 root.eval('tk::PlaceWindow . center')
 
 time_step = 0.0005
