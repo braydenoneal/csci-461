@@ -73,11 +73,12 @@ for population_iteration in range(population_iterations):
 
     best_genes.append(population[0])
 
-    print(f'Population Iteration: {population_iteration + 1} of {population_iterations}\n'
-          f'Population Size: {population_size}\n'
-          f'Number of Generations: {iterations}\n'
-          f'Best Gene: {population[0]}\n'
-          f'Best Gene Distance: {round(fitness_of_permutation(population[0]), 1)}\n')
+    if print_population_iterations:
+        print(f'Population Iteration: {population_iteration + 1} of {population_iterations}\n'
+              f'Population Size: {population_size}\n'
+              f'Number of Generations: {iterations}\n'
+              f'Best Gene: {population[0]}\n'
+              f'Best Gene Distance: {round(fitness_of_permutation(population[0]), 1)}\n')
 
 best_gene = sorted(best_genes, key=lambda x: fitness_of_permutation(x))[0]
 
