@@ -1,23 +1,10 @@
 import math
 import random
 
+population_iterations = 16
 population_size = 128
 iterations = 1024
 print_iterations = False
-
-positions = [
-    [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [5, 1], [5, 2], [5, 3], [5, 4],
-    [5, 5], [4, 5], [3, 5], [2, 5], [1, 5], [0, 5], [0, 4], [0, 3], [0, 2], [0, 1],
-]
-
-positions_size = len(positions)
-
-population = []
-
-for _ in range(population_size):
-    order = list(range(positions_size))
-    random.shuffle(order)
-    population.append(order)
 
 
 def fitness_of_permutation(permutation):
@@ -29,47 +16,67 @@ def fitness_of_permutation(permutation):
     return total_distance
 
 
-for iteration in range(iterations):
-    population = sorted(population, key=lambda x: fitness_of_permutation(x))[:population_size // 2]
+positions = [
+    [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [5, 1], [5, 2], [5, 3], [5, 4],
+    [5, 5], [4, 5], [3, 5], [2, 5], [1, 5], [0, 5], [0, 4], [0, 3], [0, 2], [0, 1],
+]
 
-    if print_iterations:
-        print(f'{round(fitness_of_permutation(population[0]), 1)} {iteration + 1} of {iterations}')
+positions_size = len(positions)
 
-    new_population = []
+best_genes = []
 
-    random.shuffle(population)
+for _ in range(population_iterations):
+    population = []
 
-    for crossover in range(population_size // 2):
-        parent1 = random.choice(population)
-        parent2 = random.choice(population)
+    for _ in range(population_size):
+        order = list(range(positions_size))
+        random.shuffle(order)
+        population.append(order)
 
-        split_position = positions_size // 2
+    for iteration in range(iterations):
+        population = sorted(population, key=lambda x: fitness_of_permutation(x))[:population_size // 2]
 
-        for parents in ((parent1, parent2), (parent2, parent1)):
-            child = parents[0][:split_position]
-            indices = []
+        if print_iterations:
+            print(f'{round(fitness_of_permutation(population[0]), 1)} {iteration + 1} of {iterations}')
 
-            for order in parents[0][split_position:]:
-                indices.append(parents[1].index(order))
+        new_population = []
 
-            for order in sorted(indices):
-                child.append(parents[1][order])
+        random.shuffle(population)
 
-            if random.random() < 0.2:
-                index1 = random.randint(0, positions_size - 1)
-                index2 = random.randint(0, positions_size - 1)
+        for crossover in range(population_size // 2):
+            parent1 = random.choice(population)
+            parent2 = random.choice(population)
 
-                temp = child[index1]
-                child[index1] = child[index2]
-                child[index2] = temp
+            split_position = positions_size // 2
 
-            new_population.append(child)
+            for parents in ((parent1, parent2), (parent2, parent1)):
+                child = parents[0][:split_position]
+                indices = []
 
-    population = new_population
+                for order in parents[0][split_position:]:
+                    indices.append(parents[1].index(order))
 
-population = sorted(population, key=lambda x: fitness_of_permutation(x))[:population_size // 2]
+                for order in sorted(indices):
+                    child.append(parents[1][order])
 
-print(f'Population Size: {population_size}\n'
+                if random.random() < 0.2:
+                    index1 = random.randint(0, positions_size - 1)
+                    index2 = random.randint(0, positions_size - 1)
+
+                    temp = child[index1]
+                    child[index1] = child[index2]
+                    child[index2] = temp
+
+                new_population.append(child)
+
+        population = new_population
+
+    best_genes.append(sorted(population, key=lambda x: fitness_of_permutation(x))[0])
+
+best_gene = sorted(best_genes, key=lambda x: fitness_of_permutation(x))[0]
+
+print(f'Number of Population Iterations: {population_iterations}\n'
+      f'Population Size: {population_size}\n'
       f'Number of Generations: {iterations}\n'
-      f'Best Gene: {population[0]}\n'
-      f'Best Gene Distance: {round(fitness_of_permutation(population[0]), 1)}')
+      f'Best Gene: {best_gene}\n'
+      f'Best Gene Distance: {round(fitness_of_permutation(best_gene), 1)}')
