@@ -4,6 +4,7 @@ import random
 population_iterations = 16
 population_size = 128
 iterations = 1024
+print_population_iterations = True
 print_iterations = False
 
 
@@ -25,7 +26,7 @@ positions_size = len(positions)
 
 best_genes = []
 
-for _ in range(population_iterations):
+for population_iteration in range(population_iterations):
     population = []
 
     for _ in range(population_size):
@@ -71,7 +72,15 @@ for _ in range(population_iterations):
 
         population = new_population
 
-    best_genes.append(sorted(population, key=lambda x: fitness_of_permutation(x))[0])
+    population = sorted(population, key=lambda x: fitness_of_permutation(x))
+
+    best_genes.append(population[0])
+
+    print(f'Population Iteration: {population_iteration + 1} of {population_iterations}\n'
+          f'Population Size: {population_size}\n'
+          f'Number of Generations: {iterations}\n'
+          f'Best Gene: {population[0]}\n'
+          f'Best Gene Distance: {round(fitness_of_permutation(population[0]), 1)}\n')
 
 best_gene = sorted(best_genes, key=lambda x: fitness_of_permutation(x))[0]
 
