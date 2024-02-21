@@ -8,7 +8,7 @@ MUTATION_FREQUENCY = 20  # Percentage of the time to mutate
 
 class Board:
     def __init__(self):  # Create a new game board
-        self.list = [random.randint(1, BOARD_SIZE) for i in range(BOARD_SIZE)]
+        self.list = [random.randint(1, BOARD_SIZE) for _ in range(BOARD_SIZE)]
         self.value = 0
         self.set_value()
 
