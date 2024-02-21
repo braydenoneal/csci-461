@@ -1,11 +1,25 @@
 import math
 import random
+import time
+import tkinter as tk
+
+window_width = 1000
+window_height = 1000
+
+root = tk.Tk()
+root.geometry(f'{window_width}x{window_height}')
+root.configure(background='#101010')
+
+canvas = tk.Canvas(root, width=window_width, height=window_height, background='#101010',
+                   bd=0, highlightthickness=0, relief='ridge')
+
+canvas.pack(expand=True)
+root.eval('tk::PlaceWindow . center')
 
 population_iterations = 32
 population_size = 128
-iterations = 1024
-print_population_iterations = True
-print_iterations = False
+iterations = 256
+mutation_chance = 0.05
 
 
 def fitness_of_permutation(permutation):
@@ -35,12 +49,11 @@ for population_iteration in range(population_iterations):
     for iteration in range(iterations):
         population = sorted(population, key=lambda x: fitness_of_permutation(x))[:population_size // 2]
 
-        if print_iterations:
-            print(f'{round(fitness_of_permutation(population[0]), 1)} {iteration + 1} of {iterations}')
-
         new_population = []
 
         random.shuffle(population)
+
+        child_iter = 0
 
         for crossover in range(population_size // 2):
             parents = (random.choice(population), random.choice(population))
@@ -57,7 +70,7 @@ for population_iteration in range(population_iterations):
                 for order in sorted(indices):
                     child.append(parent[1][order])
 
-                if random.random() < 0.2:
+                if random.random() < mutation_chance:
                     index1 = random.randint(0, positions_size - 1)
                     index2 = random.randint(0, positions_size - 1)
 
@@ -67,23 +80,33 @@ for population_iteration in range(population_iterations):
 
                 new_population.append(child)
 
+                for i in range(positions_size - 1):
+                    position1 = positions[child[i]]
+                    position2 = positions[child[i + 1]]
+
+                    x_mod = child_iter // round(math.sqrt(population_size))
+                    y_mod = child_iter % round(math.sqrt(population_size))
+
+                    x1 = position1[0] * 10 + x_mod * 80
+                    y1 = position1[1] * 10 + y_mod * 80
+
+                    x2 = position2[0] * 10 + x_mod * 80
+                    y2 = position2[1] * 10 + y_mod * 80
+
+                    red = hex(round(255 * (i / (positions_size - 1))))[2:].rjust(2, '0')
+                    green = hex(round(255 - 255 * (i / (positions_size - 1))))[2:].rjust(2, '0')
+                    canvas.create_line(x1, y1, x2, y2, width=2, fill=f'#{red}{green}{green}')
+
+                child_iter += 1
+
         population = new_population
+
+        root.update()
+        # time.sleep(0.1)
+        canvas.delete('all')
 
     population = sorted(population, key=lambda x: fitness_of_permutation(x))
 
     best_genes.append(population[0])
 
-    if print_population_iterations:
-        print(f'Population Iteration: {population_iteration + 1} of {population_iterations}\n'
-              f'Population Size: {population_size}\n'
-              f'Number of Generations: {iterations}\n'
-              f'Best Gene: {population[0]}\n'
-              f'Best Gene Distance: {round(fitness_of_permutation(population[0]), 1)}\n')
-
 best_gene = sorted(best_genes, key=lambda x: fitness_of_permutation(x))[0]
-
-print(f'Number of Population Iterations: {population_iterations}\n'
-      f'Population Size: {population_size}\n'
-      f'Number of Generations: {iterations}\n'
-      f'Best Gene: {best_gene}\n'
-      f'Best Gene Distance: {round(fitness_of_permutation(best_gene), 1)}')
