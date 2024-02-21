@@ -1,10 +1,10 @@
 import math
 import random
 
-population_iterations = 16
+population_iterations = 32
 population_size = 128
-iterations = 1024
-print_population_iterations = True
+iterations = 2048
+print_population_iterations = False
 print_iterations = False
 
 
@@ -17,10 +17,8 @@ def fitness_of_permutation(permutation):
     return total_distance
 
 
-positions = [
-    [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [5, 1], [5, 2], [5, 3], [5, 4],
-    [5, 5], [4, 5], [3, 5], [2, 5], [1, 5], [0, 5], [0, 4], [0, 3], [0, 2], [0, 1],
-]
+positions = [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [5, 1], [5, 2], [5, 3], [5, 4],
+             [5, 5], [4, 5], [3, 5], [2, 5], [1, 5], [0, 5], [0, 4], [0, 3], [0, 2], [0, 1]]
 
 positions_size = len(positions)
 
@@ -45,20 +43,19 @@ for population_iteration in range(population_iterations):
         random.shuffle(population)
 
         for crossover in range(population_size // 2):
-            parent1 = random.choice(population)
-            parent2 = random.choice(population)
+            parents = (random.choice(population), random.choice(population))
 
             split_position = positions_size // 2
 
-            for parents in ((parent1, parent2), (parent2, parent1)):
-                child = parents[0][:split_position]
+            for parent in (parents, parents[::-1]):
+                child = parent[0][:split_position]
                 indices = []
 
-                for order in parents[0][split_position:]:
-                    indices.append(parents[1].index(order))
+                for order in parent[0][split_position:]:
+                    indices.append(parent[1].index(order))
 
                 for order in sorted(indices):
-                    child.append(parents[1][order])
+                    child.append(parent[1][order])
 
                 if random.random() < 0.2:
                     index1 = random.randint(0, positions_size - 1)
