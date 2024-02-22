@@ -1,6 +1,5 @@
 import math
 import random
-import time
 import tkinter as tk
 
 window_width = 1000
@@ -19,7 +18,7 @@ root.eval('tk::PlaceWindow . center')
 population_iterations = 32
 population_size = 128
 iterations = 256
-mutation_chance = 0.05
+mutation_chance = 0.08
 
 
 def fitness_of_permutation(permutation):
@@ -58,7 +57,7 @@ for population_iteration in range(population_iterations):
         for crossover in range(population_size // 2):
             parents = (random.choice(population), random.choice(population))
 
-            split_position = positions_size // 2
+            split_position = random.randint(0, positions_size)
 
             for parent in (parents, parents[::-1]):
                 child = parent[0][:split_position]
@@ -93,16 +92,14 @@ for population_iteration in range(population_iterations):
                     x2 = position2[0] * 10 + x_mod * 80
                     y2 = position2[1] * 10 + y_mod * 80
 
-                    red = hex(round(255 * (i / (positions_size - 1))))[2:].rjust(2, '0')
-                    green = hex(round(255 - 255 * (i / (positions_size - 1))))[2:].rjust(2, '0')
-                    canvas.create_line(x1, y1, x2, y2, width=2, fill=f'#{red}{green}{green}')
+                    value = hex(round(64 + 191 * (i / (positions_size - 1))))[2:].rjust(2, '0')
+                    canvas.create_line(x1, y1, x2, y2, width=2, fill=f'#{value}{value}{value}')
 
                 child_iter += 1
 
         population = new_population
 
         root.update()
-        # time.sleep(0.1)
         canvas.delete('all')
 
     population = sorted(population, key=lambda x: fitness_of_permutation(x))
