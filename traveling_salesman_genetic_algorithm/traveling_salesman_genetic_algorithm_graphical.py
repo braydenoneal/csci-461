@@ -15,10 +15,10 @@ canvas = tk.Canvas(root, width=window_width, height=window_height, background='#
 canvas.pack(expand=True)
 root.eval('tk::PlaceWindow . center')
 
-population_iterations = 32
+run = True
 population_size = 1000
-iterations = 4096
 mutation_chance = 0.08
+display_size = 25
 
 
 def fitness_of_permutation(permutation):
@@ -40,7 +40,7 @@ best_genes = []
 text = tk.Label(root, text='')
 text.place(x=16, y=16)
 
-for population_iteration in range(population_iterations):
+while run:
     population = []
 
     for _ in range(population_size):
@@ -48,65 +48,67 @@ for population_iteration in range(population_iterations):
         random.shuffle(order)
         population.append(order)
 
-    for iteration in range(iterations):
-        if fitness_of_permutation(population[0]) > 20:
-            new_population = []
+    fitness_counter = 0
 
-            random.shuffle(population)
+    while fitness_counter < 16:
+        if fitness_of_permutation(population[0]) <= 20:
+            fitness_counter += 1
 
-            for crossover in range(population_size // 2):
-                parents = (random.choice(population), random.choice(population))
+        new_population = []
 
-                split_position = random.randint(0, positions_size)
+        random.shuffle(population)
 
-                for parent in (parents, parents[::-1]):
-                    child = parent[0][:split_position]
-                    indices = []
+        for crossover in range(population_size // 2):
+            parents = (random.choice(population), random.choice(population))
 
-                    for order in parent[0][split_position:]:
-                        indices.append(parent[1].index(order))
+            split_position = random.randint(0, positions_size)
 
-                    for order in sorted(indices):
-                        child.append(parent[1][order])
+            for parent in (parents, parents[::-1]):
+                child = parent[0][:split_position]
+                indices = []
 
-                    for gene in range(positions_size):
-                        if random.random() < mutation_chance * (gene + 1):
-                            index1 = random.randint(0, positions_size - 1)
-                            index2 = random.randint(0, positions_size - 1)
+                for order in parent[0][split_position:]:
+                    indices.append(parent[1].index(order))
 
-                            temp = child[index1]
-                            child[index1] = child[index2]
-                            child[index2] = temp
-                        else:
-                            break
+                for order in sorted(indices):
+                    child.append(parent[1][order])
 
-                    new_population.append(child)
+                for gene in range(positions_size):
+                    if random.random() < mutation_chance * (gene + 1):
+                        index1 = random.randint(0, positions_size - 1)
+                        index2 = random.randint(0, positions_size - 1)
 
-            display_size = 1
+                        temp = child[index1]
+                        child[index1] = child[index2]
+                        child[index2] = temp
+                    else:
+                        break
 
-            for order in range(display_size):
-                for i in range(positions_size):
-                    position1 = positions[population[order][i]]
-                    position2 = positions[population[order][(i + 1) % positions_size]]
+                new_population.append(child)
 
-                    x_mod = order // round(math.sqrt(display_size))
-                    y_mod = order % round(math.sqrt(display_size))
+        for order in range(display_size):
+            for i in range(positions_size):
+                position1 = positions[population[order][i]]
+                position2 = positions[population[order][(i + 1) % positions_size]]
 
-                    x1 = position1[0] * 10 + x_mod * 80 + 64
-                    y1 = position1[1] * 10 + y_mod * 80 + 64
+                x_mod = order // round(math.sqrt(display_size))
+                y_mod = order % round(math.sqrt(display_size))
 
-                    x2 = position2[0] * 10 + x_mod * 80 + 64
-                    y2 = position2[1] * 10 + y_mod * 80 + 64
+                x1 = position1[0] * 10 + x_mod * 80 + 64
+                y1 = position1[1] * 10 + y_mod * 80 + 64
 
-                    value = hex(round(64 + 191 * (i / (positions_size - 1))))[2:].rjust(2, '0')
-                    canvas.create_line(x1, y1, x2, y2, width=2, fill=f'#{value}{value}{value}')
+                x2 = position2[0] * 10 + x_mod * 80 + 64
+                y2 = position2[1] * 10 + y_mod * 80 + 64
 
-            population = sorted(new_population, key=lambda x: fitness_of_permutation(x))[:population_size // 2]
+                value = hex(round(64 + 191 * (i / (positions_size - 1))))[2:].rjust(2, '0')
+                canvas.create_line(x1, y1, x2, y2, width=2, fill=f'#{value}{value}{value}')
 
-            text.config(text=f'Best Distance: {str(round(fitness_of_permutation(population[0]), 2))}')
+        population = sorted(new_population, key=lambda x: fitness_of_permutation(x))[:population_size // 2]
 
-            root.update()
-            canvas.delete('all')
+        text.config(text=f'Best Distance: {str(round(fitness_of_permutation(population[0]), 2))}')
+
+        root.update()
+        canvas.delete('all')
 
     population = sorted(population, key=lambda x: fitness_of_permutation(x))
 
