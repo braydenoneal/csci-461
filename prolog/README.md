@@ -6,11 +6,11 @@
 ```prolog
 sibling(X, Y) :- 
     parent(Z, X),
-    parent(Z, Y)
+    parent(Z, Y).
     
 sister(X, Y) :- 
     sibling(X, Y),
-    female(X)
+    female(X).
 ```
 
 2. Using the structures `parent(X, Y)`, `male(X)`, and `female(X)`, write a structure that defines `mother(X, Y)`.
@@ -18,7 +18,7 @@ sister(X, Y) :-
 ```prolog
 mother(X, Y) :- 
     parent(X, Y),
-    female(X)
+    female(X).
 ```
 
 3. Complete the "permutation sort" discussed in the first Prolog lecture. (i.e., `sorted (X, Y)` is `permutation (X, Y)` 
