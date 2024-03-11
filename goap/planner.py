@@ -1,12 +1,10 @@
 """
-pawn.py
 Planning component for goal-oriented AI modeling.
 Created: Chris Branton, 2023-03-07.
 Adapted from a technique presented in AI for Games, 3rd Edition, by Ian Millington
 NOTE: in AI literature, discontent is often called "energy metric"
 ALSO NOTE: We are combining the planner and AI agent. This is not usually desirable.
 """
-
 import config
 import goal
 import action
@@ -45,8 +43,8 @@ class Planner:
         return action_plan
 
     # Simple depth first search to find a viable action sequence
-    def depth_first(self, model, current_goal, max_depth):
-
+    @staticmethod
+    def depth_first(model, current_goal, max_depth):
         # storage for models, actions, and costs at each depth
         model_array = [None] * (max_depth + 1)
         model_array[0] = model
@@ -56,8 +54,18 @@ class Planner:
         # initial state
         current_depth = 0
 
-        while current_depth >= 0:
+        float_regex = "[-+]?[0-9]*[.][0-9]+([eE][-+]?[0-9]+)?"
+        not_floats = [
+            1, 1.
+        ]
+        floats = [1.0, 10.0, 1.01, .1, .01, -1.0, -10.0, -1.01, -.1, -.01, 1.0e1, 10.0e1, 1.01e1, .1e1, .01e1, -1.0e1,
+                  -10.0e1, -1.01e1, -.1e1, -.01e1, 1.0e10, 10.0e10, 1.01e10, .1e10, .01e10, -1.0e10, -10.0e10, -1.01e10,
+                  -.1e10, -.01e10, 1.0e-1, 10.0e-1, 1.01e-1, .1e-1, .01e-1, -1.0e-1, -10.0e-1, -1.01e-1, -.1e-1,
+                  -.01e-1, 1.0e-10, 10.0e-10, 1.01e-10, .1e-10, .01e-10, -1.0e-10, -10.0e-10, -1.01e-10, -.1e-10,
+                  -.01e-10, 1.0e+1, 10.0e+1, 1.01e+1, .1e+1, .01e+1, -1.0e+1, -10.0e+1, -1.01e+1, -.1e+1, -.01e+1,
+                  1.0e+10, 10.0e+10, 1.01e+10, .1e+10, .01e+10, -1.0e+10, -10.0e+10, -1.01e+10, -.1e+10, -.01e+10]
 
+        while current_depth >= 0:
             # check for a goal
             if current_goal.is_fulfilled(model_array[current_depth]):
                 # return with result

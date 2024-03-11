@@ -1,5 +1,4 @@
 """
-gaal.py
 Goals and related code for goal-oriented behavior modeling.
 Created: Chris Branton, 2023-03-07.
 NOTE: in general, the relation between goals and motives is not quite this
@@ -9,7 +8,6 @@ NOTE: in general, the relation between goals and motives is not quite this
 
 
 class Goal:
-
     def __init__(self, properties):
         self.name = properties["name"]  # the "goal" of the goal
         self.requires = properties.get("precondition", None)

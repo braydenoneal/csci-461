@@ -1,5 +1,4 @@
 """
-action.py
 Actions and related code for goal-oriented behavior modeling.
 Created: Chris Branton, 2023-03-07.
 

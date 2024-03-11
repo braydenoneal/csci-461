@@ -1,5 +1,4 @@
 """
-config.py
 Test configuration data for GOAP implementation.
 
 Created: Chris Branton, 2023-05-07.

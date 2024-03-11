@@ -1,5 +1,4 @@
 """
-worldmodel.py
 Simple shared state model used to track conditions in the world.
 NOTE: for the GOAP implementation we will use this to model the
     agent's belief about the world and how it will change due to

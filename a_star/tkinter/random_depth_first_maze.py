@@ -4,7 +4,6 @@ import time
 import tkinter as tk
 import random
 import numpy as np
-import ctypes as ct
 from dataclasses import dataclass
 
 window_width = 1000
@@ -17,16 +16,8 @@ maze_rows = 65
 tile_width = (window_width - window_padding * 2) / maze_columns
 tile_height = (window_height - window_padding * 2) / maze_rows
 
-
-def dark_title_bar(window):
-    window.update()
-    ct.windll.dwmapi.DwmSetWindowAttribute(
-        ct.windll.user32.GetParent(window.winfo_id()), 20, ct.byref(ct.c_int(2)), ct.sizeof(ct.c_int(2)))
-
-
 root = tk.Tk()
 root.geometry(f'{window_width}x{window_height}')
-dark_title_bar(root)
 root.configure(background='#101010')
 
 canvas = tk.Canvas(root, width=window_width, height=window_height, background='#101010',
@@ -73,7 +64,10 @@ while True:
 
     visited = []
 
+    counter = 0
+
     while len(stack):
+        counter = (counter + 1) % 10
         current_tile = stack[-1]
         visited.append(current_tile)
         tiles[current_tile[0]][current_tile[1]] = True
@@ -107,8 +101,9 @@ while True:
 
             canvas.create_rectangle(x, y, x + tile_width, y + tile_height, fill='#404040', outline='')
 
-            time.sleep(time_step)
-            root.update()
+            # time.sleep(time_step)
+            if counter <= 0:
+                root.update()
 
     root.update()
 
