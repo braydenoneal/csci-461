@@ -46,12 +46,23 @@ class WorldModel:
     # select the next action that applies
     def next_action(self):
         self.current_action_index += 1
+
+        valid_actions = []
+
         for a in self.action_list:
-            if not a.requires:
-                return a
+            preconditions_met_quantity = 0
+
             for precondition in a.requires:
                 if precondition in self.current_state:
-                    return a
+                    preconditions_met_quantity += 1
+
+            if preconditions_met_quantity >= len(a.requires):
+                valid_actions.append(a)
+
+        if valid_actions:
+            valid_actions = sorted(valid_actions, key=lambda x: x.cost)
+            return valid_actions[0]
+
         return None
 
     # Remove an action from our action list
