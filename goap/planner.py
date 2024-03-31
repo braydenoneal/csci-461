@@ -5,15 +5,22 @@ Adapted from a technique presented in AI for Games, 3rd Edition, by Ian Millingt
 NOTE: in AI literature, discontent is often called "energy metric"
 ALSO NOTE: We are combining the planner and AI agent. This is not usually desirable.
 """
-import config
-import goal
 import action
 import copy
+from dataclasses import dataclass
 
 from worldmodel import WorldModel
-from config import *
 
 no_action = action.Action({"name": "No action", "cost": 1})
+
+
+@dataclass
+class Sequence:
+    model: WorldModel
+    actions: list
+    complete: bool
+    depth: int
+    cost: int
 
 
 class Planner:
@@ -21,10 +28,9 @@ class Planner:
         self.model = world_model
 
     def run(self):
-        for iteration in range(20):
+        for iteration in range(1):
             # Limit the depth to the number of possible actions.
-            max_depth = self.model.num_actions
-            action_plan = self.plan_action(self.model, max_depth)
+            action_plan = self.plan_action(self.model, 4)
             if action_plan:
                 print("Best plan is")
                 for a in action_plan:
@@ -36,51 +42,52 @@ class Planner:
 
     # This method is intentionally small to facilitate different
     # search methods
-    def plan_action(self, model, max_depth=10):
+    def plan_action(self, model, max_depth=4):
         current_goal = self.choose_goal()
-        action_plan = self.depth_first(model, current_goal, max_depth)
-        # if we have an action, return it
-        return action_plan
 
-    # Simple depth first search to find a viable action sequence
+        # get all viable action sequences
+        sequences = self.optimal_search(model, current_goal, max_depth)
+        # sort viable action sequences by their cost
+        sequences = sorted(sequences, key=lambda x: x.cost)
+
+        # if we have an action, return the one with the lowest cost
+        return sequences[0].actions
+
+    # Find all viable action sequences with a depth limit
     @staticmethod
-    def depth_first(model, current_goal, max_depth):
-        # storage for models, actions, and costs at each depth
-        model_array = [None] * (max_depth + 1)
-        model_array[0] = model
-        action_sequence = [None] * max_depth
-        costs = [0] * max_depth
+    def optimal_search(model, current_goal, max_depth) -> list[Sequence]:
+        sequences: list[Sequence] = [Sequence(model, [], False, 0, 0)]
 
-        # initial state
-        current_depth = 0
+        all_complete = False
 
-        while current_depth >= 0:
-            # check for a goal
-            if current_goal.is_fulfilled(model_array[current_depth]):
-                # return with result
-                return action_sequence
+        while not all_complete:
+            all_complete = True
 
-            # otherwise try the next action
-            next_action = model_array[current_depth].next_action()
+            for sequence in sequences:
+                if sequence.depth >= max_depth:
+                    sequences.remove(sequence)
+                    sequence.complete = True
 
-            if next_action:
-                # copy the current model and apply the action
-                model_array[current_depth + 1] = copy.deepcopy(model_array[current_depth])
-                action_sequence[current_depth] = next_action
-                model_array[current_depth + 1].apply_action(next_action)
+                if current_goal.is_fulfilled(sequence.model):
+                    sequence.complete = True
 
-                # set costs[current_depth+1]
-                costs[current_depth + 1] = costs[current_depth] + next_action.get_cost
+                if not sequence.complete:
+                    all_complete = False
 
-                # on to the next level
-                current_depth += 1
+                    for action in sequence.model.get_available_actions():
+                        new_sequence = copy.deepcopy(sequence)
+                        new_sequence.actions.append(action)
+                        new_sequence.model.apply_action(action)
+                        new_sequence.depth += 1
+                        new_sequence.cost += action.get_cost
 
-            else:  # no action to try
-                # drop back
-                current_depth -= 1
+                        # print(f'{new_sequence.actions[-1].name}\n')
+                        sequences.append(new_sequence)
 
-        # finished iterating and didn't find an action
-        return None
+                    # sequence.complete = True
+                    sequences.remove(sequence)
+
+        return sequences
 
     # Chooses a goal to pursue based on
     def choose_goal(self):

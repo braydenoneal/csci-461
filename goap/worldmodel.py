@@ -17,7 +17,7 @@ class WorldModel:
         self.goal_list = []
         for curr_goal in goal_list:
             self.goal_list.append(Goal(curr_goal))
-        self.action_list = []
+        self.action_list: list[Action] = []
         for curr_action in action_list:
             act = Action(curr_action)
             self.action_list.append(act)
@@ -43,27 +43,21 @@ class WorldModel:
             cost += action.get_cost
         return cost
 
-    # select the next action that applies
-    def next_action(self):
-        self.current_action_index += 1
+    # get all available actions
+    def get_available_actions(self) -> list[Action]:
+        valid_actions: list[Action] = []
 
-        valid_actions = []
-
-        for a in self.action_list:
+        for action in self.action_list:
             preconditions_met_quantity = 0
 
-            for precondition in a.requires:
+            for precondition in action.requires:
                 if precondition in self.current_state:
                     preconditions_met_quantity += 1
 
-            if preconditions_met_quantity >= len(a.requires):
-                valid_actions.append(a)
+            if preconditions_met_quantity >= len(action.requires):
+                valid_actions.append(action)
 
-        if valid_actions:
-            valid_actions = sorted(valid_actions, key=lambda x: x.cost)
-            return valid_actions[0]
-
-        return None
+        return valid_actions
 
     # Remove an action from our action list
     def remove_action(self, act):
