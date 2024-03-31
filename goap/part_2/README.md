@@ -50,10 +50,8 @@ def optimal_search(model, current_goal, max_depth) -> list[Sequence]:
                     new_sequence.depth += 1
                     new_sequence.cost += action.get_cost
 
-                    # print(f'{new_sequence.actions[-1].name}\n')
                     sequences.append(new_sequence)
 
-                # sequence.complete = True
                 sequences.remove(sequence)
 
     return sequences
