@@ -144,3 +144,8 @@ The first section outputs each node value and the values and labels of each of i
 ```
 
 The letter frequencies listed on the Wikipedia page do not add up to exactly 100% for some reason.
+
+## Update
+
+I just realized after finishing the assignment that it asks for only the first eight letters in of the frequency list. 
+¯\_(ツ)_/¯
