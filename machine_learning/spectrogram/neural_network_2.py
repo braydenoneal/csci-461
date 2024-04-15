@@ -10,7 +10,7 @@ image_size = 100
 train_amount = 0.8
 learning_rate = 0.001
 momentum = 0.9
-epochs = 96
+epochs = 64
 batch_size = 32
 centered = True
 normalized = True
@@ -52,6 +52,8 @@ if normalized:
 yss_train = yss[random_split][:train_split_amount]
 yss_test = yss[random_split][train_split_amount:]
 
+image_dimensions = image_size * image_size
+
 
 class ConvolutionalModel(nn.Module):
     def __init__(self):
@@ -66,14 +68,14 @@ class ConvolutionalModel(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
         )
-        self.fc_layer1 = nn.Linear(image_size * image_size * 2, 200)
-        self.fc_layer2 = nn.Linear(200, len(yss_list))
+        self.fc_layer1 = nn.Linear(image_dimensions * 2, image_dimensions)
+        self.fc_layer2 = nn.Linear(image_dimensions, len(yss_list))
 
     def forward(self, forward_xss):
         forward_xss = torch.unsqueeze(forward_xss, dim=1)
         forward_xss = self.meta_layer1(forward_xss)
         forward_xss = self.meta_layer2(forward_xss)
-        forward_xss = torch.reshape(forward_xss, (-1, image_size * image_size * 2))
+        forward_xss = torch.reshape(forward_xss, (-1, image_dimensions * 2))
         forward_xss = self.fc_layer1(forward_xss)
         forward_xss = self.fc_layer2(forward_xss)
         return torch.log_softmax(forward_xss, dim=1)
@@ -83,75 +85,50 @@ model = ConvolutionalModel()
 criterion = nn.NLLLoss()
 
 
-# def pct_correct(xss_test_, yss_test_):
-#     count = 0
-#
-#     for x, y in zip(xss_test_, yss_test_):
-#         if torch.argmax(x).item() == y.item():
-#             count += 1
-#
-#     return 100 * count / len(xss_test_)
-#
-#
-# model = dulib.train(
-#     model,
-#     crit=criterion,
-#     train_data=(xss_train, yss_train),
-#     valid_data=(xss_test, yss_test),
-#     learn_params={'lr': learning_rate, 'mo': momentum},
-#     epochs=epochs,
-#     bs=batch_size,
-#     valid_metric=pct_correct,
-#     graph=1,
-#     print_lines=(-1,)
-# )
-#
-# print('\nTraining Data Confusion Matrix\n')
-# pct_training = dulib.class_accuracy(model, (xss_train, yss_train), show_cm=True)
-#
-# print('\nTesting Data Confusion Matrix\n')
-# pct_testing = dulib.class_accuracy(model, (xss_test, yss_test), show_cm=True)
-#
-# print(
-#     f'\n'
-#     f'Percentage correct on training data: {100 * pct_training:.2f}\n'
-#     f'Percentage correct on testing data: {100 * pct_testing:.2f}\n'
-#     f'\n'
-#     f'Learning Rate: {learning_rate}\n'
-#     f'Momentum: {momentum}\n'
-#     f'Epochs: {epochs}\n'
-#     f'Batch Size: {batch_size}'
-# )
+def pct_correct(xss_test_, yss_test_):
+    count = 0
 
-model, valids = dulib.cv_train(
+    for x, y in zip(xss_test_, yss_test_):
+        if torch.argmax(x).item() == y.item():
+            count += 1
+
+    return 100 * count / len(xss_test_)
+
+
+model = dulib.train(
     model,
     crit=criterion,
     train_data=(xss_train, yss_train),
+    valid_data=(xss_test, yss_test),
     learn_params={'lr': learning_rate, 'mo': momentum},
     epochs=epochs,
     bs=batch_size,
-    verb=10,
-    k=10,
-    bail_after=30,
+    valid_metric=pct_correct,
+    graph=1,
+    print_lines=(-1,)
 )
 
-print('\nTraining Data Confusion Matrix\n')
-pct_training = dulib.class_accuracy(model, (xss_train, yss_train), show_cm=True)
+pct_training = dulib.class_accuracy(model, (xss_train, yss_train), show_cm=False)
 
-print('\nTesting Data Confusion Matrix\n')
-pct_testing = dulib.class_accuracy(model, (xss_test, yss_test), show_cm=True)
+pct_testing = dulib.class_accuracy(model, (xss_test, yss_test), show_cm=False)
 
 print(
     f'\n'
     f'Percentage correct on training data: {100 * pct_training:.2f}\n'
     f'Percentage correct on testing data: {100 * pct_testing:.2f}\n'
     f'\n'
-    f'Valids: {valids}\n'
-    f'Train Amount: {train_amount * 100}%\n'
     f'Learning Rate: {learning_rate}\n'
     f'Momentum: {momentum}\n'
     f'Epochs: {epochs}\n'
-    f'Batch Size: {batch_size}\n'
-    f'Centered: {centered}\n'
-    f'Normalized: {normalized}'
+    f'Batch Size: {batch_size}'
 )
+
+"""
+Percentage correct on training data: 100.00
+Percentage correct on testing data: 100.00
+
+Learning Rate: 0.001
+Momentum: 0.9
+Epochs: 64
+Batch Size: 32
+"""

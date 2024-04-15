@@ -8,12 +8,13 @@ import os
 image_size = 100
 
 train_amount = 0.8
-learning_rate = 0.001
-momentum = 0.9
-epochs = 96
+learning_rate = 0.01
+momentum = 0.75
+epochs = 64
 batch_size = 32
 centered = True
 normalized = True
+hidden_layer_widths = [200]
 
 yss_dictionary = {}
 yss_list = []
@@ -53,6 +54,44 @@ yss_train = yss[random_split][:train_split_amount]
 yss_test = yss[random_split][train_split_amount:]
 
 
+# class LogSoftmaxModel(nn.Module):
+#     def __init__(self):
+#         super(LogSoftmaxModel, self).__init__()
+#         widths = hidden_layer_widths.copy()
+#         widths.insert(0, image_size * image_size)
+#         widths.append(len(yss_list))
+#
+#         self.in_layer = nn.Linear(image_size * image_size, widths[0])
+#
+#         hidden_layers = []
+#
+#         for j in range(len(widths) - 1):
+#             hidden_layers.append(nn.Linear(widths[j], widths[j + 1]))
+#
+#         self.hidden_layers = nn.ModuleList(hidden_layers)
+#         self.out_layer = nn.Linear(widths[-1], len(yss_list))
+#
+#     def forward(self, x):
+#         x = self.in_layer(x)
+#         for layer in self.hidden_layers:
+#             x = torch.relu(layer(x))
+#         x = self.out_layer(x)
+#         return torch.log_softmax(x, dim=1)
+#
+#
+# model = LogSoftmaxModel()
+# criterion = nn.NLLLoss()
+#
+#
+# def pct_correct(xss_test_, yss_test_):
+#     count = 0
+#
+#     for x, y in zip(xss_test_, yss_test_):
+#         if torch.argmax(x).item() == y.item():
+#             count += 1
+#
+#     return 100 * count / len(xss_test_)
+
 class ConvolutionalModel(nn.Module):
     def __init__(self):
         super(ConvolutionalModel, self).__init__()
@@ -83,56 +122,27 @@ model = ConvolutionalModel()
 criterion = nn.NLLLoss()
 
 
-# def pct_correct(xss_test_, yss_test_):
-#     count = 0
-#
-#     for x, y in zip(xss_test_, yss_test_):
-#         if torch.argmax(x).item() == y.item():
-#             count += 1
-#
-#     return 100 * count / len(xss_test_)
-#
-#
-# model = dulib.train(
-#     model,
-#     crit=criterion,
-#     train_data=(xss_train, yss_train),
-#     valid_data=(xss_test, yss_test),
-#     learn_params={'lr': learning_rate, 'mo': momentum},
-#     epochs=epochs,
-#     bs=batch_size,
-#     valid_metric=pct_correct,
-#     graph=1,
-#     print_lines=(-1,)
-# )
-#
-# print('\nTraining Data Confusion Matrix\n')
-# pct_training = dulib.class_accuracy(model, (xss_train, yss_train), show_cm=True)
-#
-# print('\nTesting Data Confusion Matrix\n')
-# pct_testing = dulib.class_accuracy(model, (xss_test, yss_test), show_cm=True)
-#
-# print(
-#     f'\n'
-#     f'Percentage correct on training data: {100 * pct_training:.2f}\n'
-#     f'Percentage correct on testing data: {100 * pct_testing:.2f}\n'
-#     f'\n'
-#     f'Learning Rate: {learning_rate}\n'
-#     f'Momentum: {momentum}\n'
-#     f'Epochs: {epochs}\n'
-#     f'Batch Size: {batch_size}'
-# )
+def pct_correct(xss_test_, yss_test_):
+    count = 0
 
-model, valids = dulib.cv_train(
+    for x, y in zip(xss_test_, yss_test_):
+        if torch.argmax(x).item() == y.item():
+            count += 1
+
+    return 100 * count / len(xss_test_)
+
+
+model = dulib.train(
     model,
     crit=criterion,
     train_data=(xss_train, yss_train),
+    valid_data=(xss_test, yss_test),
     learn_params={'lr': learning_rate, 'mo': momentum},
     epochs=epochs,
     bs=batch_size,
-    verb=10,
-    k=10,
-    bail_after=30,
+    valid_metric=pct_correct,
+    graph=0,
+    print_lines=(-1,)
 )
 
 print('\nTraining Data Confusion Matrix\n')
@@ -146,12 +156,10 @@ print(
     f'Percentage correct on training data: {100 * pct_training:.2f}\n'
     f'Percentage correct on testing data: {100 * pct_testing:.2f}\n'
     f'\n'
-    f'Valids: {valids}\n'
-    f'Train Amount: {train_amount * 100}%\n'
+    f'Train Amount: {100 * train_amount}%\n'
     f'Learning Rate: {learning_rate}\n'
     f'Momentum: {momentum}\n'
     f'Epochs: {epochs}\n'
     f'Batch Size: {batch_size}\n'
-    f'Centered: {centered}\n'
-    f'Normalized: {normalized}'
+    f'Hidden Layer Widths: {hidden_layer_widths}\n'
 )
