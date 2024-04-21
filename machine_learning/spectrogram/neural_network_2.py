@@ -8,9 +8,9 @@ import os
 image_size = 100
 
 train_amount = 0.8
-learning_rate = 0.001
+learning_rate = 0.0001
 momentum = 0.9
-epochs = 64
+epochs = 1024
 batch_size = 32
 centered = True
 normalized = True
@@ -19,12 +19,17 @@ yss_dictionary = {}
 yss_list = []
 xss_list = []
 
+print('Reading images')
+
 for subdir, dirs, files in os.walk('images'):
     for file in files:
         if file[-4:] == '.png':
             yss_dictionary[subdir] = 0
             yss_list.append(list(yss_dictionary.keys()).index(subdir))
             xss_list.append(io.imread(os.path.join(subdir, file), as_gray=True))
+            print('.', end='')
+
+print()
 
 yss = torch.LongTensor(len(yss_list))
 xss = torch.FloatTensor(len(xss_list), image_size, image_size)
@@ -105,7 +110,8 @@ model = dulib.train(
     bs=batch_size,
     valid_metric=pct_correct,
     graph=1,
-    print_lines=(-1,)
+    print_lines=(-1,),
+    gpu=(-1,)
 )
 
 pct_training = dulib.class_accuracy(model, (xss_train, yss_train), show_cm=False)

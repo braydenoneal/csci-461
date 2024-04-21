@@ -3,50 +3,54 @@ import csv
 
 from decision_tree import DecisionTree
 
+column_names = ['pclass', 'survived', 'name', 'sex', 'age', 'sibsp', 'parch', 'ticket', 'fare', 'cabin', 'embarked',
+                'boat', 'body', 'home.dest']
+train_file = 'input/titanic_train.csv'
+test_file = 'input/titanic_test.csv'
+
 
 class MainGui:
     def __init__(self):
         self.appGui = gui()
         self.dt = DecisionTree()
-        self.data: list[dict] = []
         self.attributes: dict.keys = []
+        self.training_set: list[dict] = []
+        self.test_set: list[dict] = []
 
-    # add & configure widgets
     def configure(self):
-        self.appGui.addLabelFileEntry("CSV File")
-        self.appGui.addButtons(["Read File", "Build Decision Tree", "Test Decision Tree"], self.button_press)
+        self.appGui.addButtons(['Build Decision Tree', 'Test Decision Tree'], self.button_press)
 
-    # configure window and start
     def start(self):
         self.configure()
         self.appGui.go()
 
-    # event handler for button presses
     def button_press(self, button):
-        if button == "Read File":
-            self.read_file(self.appGui.getEntry("CSV File"))
-            self.attributes = self.data[0].keys()
+        if button == 'Build Decision Tree':
+            with open(train_file) as csvfile:
+                reader = csv.DictReader(csvfile, column_names)
 
-        # TODO: handle the other events
-        elif button == "Build Decision Tree":
-            print("Building decision tree")
+                first_row: dict = next(reader)
+                self.attributes = first_row.keys()
 
-        elif button == "Test Decision Tree":
-            print("Testing decision tree")
+                for row in reader:
+                    self.training_set.append(row)
 
-    # read the comma-separated data file and store the contents
-    def read_file(self, file_name):
-        with open(file_name) as csvfile:
-            reader = csv.DictReader(csvfile, ["pclass", "survived", "name", "sex", "age", "sibsp", "parch",
-                                              "ticket", "fare", "cabin", "embarked", "boat", "body", "home.dest"])
+            self.dt.train(self.training_set, self.attributes)
+            print(self.dt.root.child_nodes)
 
-            for row in reader:
-                self.data.append(row)
+        elif button == 'Test Decision Tree':
+            with open(test_file) as csvfile:
+                reader = csv.DictReader(csvfile, column_names)
 
-        print(self.data)
+                first_row: dict = next(reader)
+                self.attributes = first_row.keys()
+
+                for row in reader:
+                    self.test_set.append(row)
+
+            self.dt.test(self.test_set)
 
 
-# Start the GUI if this is the main script
 if __name__ == '__main__':
     app = MainGui()
     app.start()
