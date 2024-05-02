@@ -65,43 +65,37 @@ model training to take hours.
 
 ### Fast Fourier Transform
 
-Using the FFT, the neural network was able to train up to 100% accuracy on the training split and 97.5% accuracy on
+Using the FFT, the neural network was able to train up to 98.75% accuracy on the training split and 92.5% accuracy on
 the testing split.
 
 ```text
-Percentage correct on training data: 100.00
-Percentage correct on testing data: 97.50
+Percentage correct on training data: 98.75
+Percentage correct on testing data: 92.50
 
-Valids: 0.0
-Train Amount: 80.0%
-Learning Rate: 0.001
+Learning Rate: 0.0001
 Momentum: 0.9
-Epochs: 96
+Epochs: 128
 Batch Size: 32
-Centered: True
-Normalized: True
 ```
 
 ### Continuous Wavelet Transform
 
-Using the CWT, the neural network was able to train up to 100% accuracy on the training split and 90% accuracy on
+Using the CWT, the neural network was able to train up to 99.38% accuracy on the training split and 97.5% accuracy on
 the testing split.
 
 ```text
-Percentage correct on training data: 100.00
-Percentage correct on testing data: 90.00
+Percentage correct on training data: 99.38
+Percentage correct on testing data: 97.50
 
-Valids: 0.0
-Train Amount: 80.0%
-Learning Rate: 0.001
+Learning Rate: 0.0001
 Momentum: 0.9
-Epochs: 96
+Epochs: 128
 Batch Size: 32
-Centered: True
-Normalized: True
 ```
 
-## How view of AI has changed
+### Conclusion
+
+
 
 ## Sources
 
