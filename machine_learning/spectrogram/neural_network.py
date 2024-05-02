@@ -155,3 +155,33 @@ print(
     f'Centered: {centered}\n'
     f'Normalized: {normalized}'
 )
+
+"""
+FFT
+
+Percentage correct on training data: 100.00
+Percentage correct on testing data: 87.50
+
+Valids: 0.0
+Train Amount: 80.0%
+Learning Rate: 0.001
+Momentum: 0.9
+Epochs: 96
+Batch Size: 32
+Centered: True
+Normalized: True
+
+CWT
+
+Percentage correct on training data: 100.00
+Percentage correct on testing data: 90.00
+
+Valids: 0.0
+Train Amount: 80.0%
+Learning Rate: 0.001
+Momentum: 0.9
+Epochs: 96
+Batch Size: 32
+Centered: True
+Normalized: True
+"""

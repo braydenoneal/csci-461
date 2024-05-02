@@ -10,7 +10,7 @@ image_size = 100
 train_amount = 0.8
 learning_rate = 0.0001
 momentum = 0.9
-epochs = 1024
+epochs = 128
 batch_size = 32
 centered = True
 normalized = True
@@ -21,7 +21,7 @@ xss_list = []
 
 print('Reading images')
 
-for subdir, dirs, files in os.walk('images'):
+for subdir, dirs, files in os.walk('../images_cwt'):
     for file in files:
         if file[-4:] == '.png':
             yss_dictionary[subdir] = 0
@@ -109,7 +109,7 @@ model = dulib.train(
     epochs=epochs,
     bs=batch_size,
     valid_metric=pct_correct,
-    graph=1,
+    graph=0,
     print_lines=(-1,),
     gpu=(-1,)
 )
