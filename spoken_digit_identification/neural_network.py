@@ -7,13 +7,13 @@ import os
 
 image_size = 100
 
-train_amount = 0.8
-learning_rate = 0.001
+train_amount = 0.75
+learning_rate = 1e-3
 momentum = 0.9
-epochs = 8
-batch_size = 30
-centered = True
-normalized = True
+epochs = 64
+batch_size = 64
+centered = False
+normalized = False
 
 yss_dictionary = {}
 yss_list = []
@@ -22,8 +22,12 @@ xss_list = []
 print('Reading images')
 
 for subdir, dirs, files in os.walk('images'):
+    count = 0
     for file in files:
         if file[-4:] == '.png':
+            if count > 128:
+                break
+            count += 1
             yss_dictionary[subdir] = 0
             yss_list.append(list(yss_dictionary.keys()).index(subdir))
             xss_list.append(io.imread(os.path.join(subdir, file), as_gray=True))
@@ -61,41 +65,30 @@ class ConvolutionalModel(nn.Module):
     def __init__(self):
         super(ConvolutionalModel, self).__init__()
 
-        self.meta_layer1 = nn.Sequential(
-            # nn.Conv2d(in_channels=1, out_channels=16, kernel_size=5, stride=1, padding=2),
-            nn.Conv2d(in_channels=1, out_channels=96, kernel_size=5, stride=1, padding=2),
+        self.network = nn.Sequential(
+            # 1 @ 100x100
+            nn.Conv2d(in_channels=1, out_channels=20, kernel_size=5, stride=1, padding=2),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
-        )
-
-        self.meta_layer2 = nn.Sequential(
-            # nn.Conv2d(in_channels=16, out_channels=32, kernel_size=5, stride=1, padding=2),
-            nn.Conv2d(in_channels=96, out_channels=192, kernel_size=5, stride=1, padding=2),
+            # 16 @ 100x100
+            nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+            # 16 @ 50x50
+            nn.Conv2d(in_channels=20, out_channels=50, kernel_size=5, stride=1, padding=2),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
+            # 32 @ 50x50
+            nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+            # 32 @ 25x25
+            nn.Flatten(),
+            nn.Linear(50 * (image_size // 2 // 2) ** 2, image_dimensions),
+            nn.Linear(image_dimensions, len(yss_dictionary.keys())),
+            nn.LogSoftmax(dim=1),
         )
-
-        self.fc_layer1 = nn.Linear(image_dimensions * 2, image_dimensions)
-        self.fc_layer2 = nn.Linear(image_dimensions, len(yss_dictionary.keys()))
 
     def forward(self, forward_xss):
-        forward_xss = torch.unsqueeze(forward_xss, dim=1)
-
-        forward_xss = self.meta_layer1(forward_xss)
-        forward_xss = self.meta_layer2(forward_xss)
-
-        forward_xss = torch.reshape(forward_xss, (-1, image_dimensions * 2))
-
-        forward_xss = self.fc_layer1(forward_xss)
-        forward_xss = self.fc_layer2(forward_xss)
-
-        return torch.log_softmax(forward_xss, dim=1)
-        # return torch.sigmoid(forward_xss)
+        return self.network(torch.unsqueeze(forward_xss, dim=1))
 
 
 model = ConvolutionalModel()
 criterion = nn.NLLLoss()
-# criterion = nn.MSELoss()
 
 
 def pct_correct(xss_test_, yss_test_):
@@ -122,6 +115,18 @@ model = dulib.train(
     gpu=(-1,)
 )
 
+# model, valids = dulib.cv_train(
+#     model,
+#     crit=criterion,
+#     train_data=(xss_train, yss_train),
+#     learn_params={'lr': learning_rate, 'mo': momentum},
+#     epochs=epochs,
+#     bs=batch_size,
+#     verb=10,
+#     k=10,
+#     bail_after=30,
+# )
+
 pct_training = dulib.class_accuracy(model, (xss_train, yss_train), show_cm=False)
 
 pct_testing = dulib.class_accuracy(model, (xss_test, yss_test), show_cm=True)
@@ -137,15 +142,14 @@ print(
     f'Batch Size: {batch_size}'
 )
 
-model.eval()
+with torch.no_grad():
+    model.eval()
 
-xss_list = [io.imread('images/0/0_01_0.png', as_gray=True)]
-xss = torch.FloatTensor(1, image_size, image_size).cuda()
+    xss_list = [io.imread('record.png', as_gray=True)]
+    # xss_list = [torch.FloatTensor((image_size, image_size))]
+    xss = torch.FloatTensor(1, image_size, image_size).cuda()
 
-output = model(xss)
+    output = model(xss)
 
-print(output)
-
-# output = output * xss_train_stds + xss_train_means
-
-print(output.data.cpu().detach().numpy().argmax().item())
+    print(output)
+    print(output.argmax(axis=1).cpu().numpy())
